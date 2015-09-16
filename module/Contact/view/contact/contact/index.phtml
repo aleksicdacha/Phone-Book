@@ -1,0 +1,131 @@
+
+
+<?php
+       echo $this->partial('search'); 
+?>
+            
+
+<!--  ////////////////////////////////////////////////////////////////////////////////////////  -->
+
+<!--    This is a block of code that needs to be processed and transferred to the right place   -->
+
+<!--  ////////////////////////////////////////////////////////////////////////////////////////  -->
+
+
+            <?php 
+    
+    if (isset($_GET['search']) AND $_GET['search'] != ''){
+
+            $value = $_GET['search'];
+
+            //echo $value;
+            $conn = mysqli_connect('localhost', 'root', '', 'phonebook');
+                     if(mysqli_connect_errno()){
+                        
+                        echo mysqli_connect_errno();
+                        die(); 
+                    }//else{echo "DB OK";}
+
+            $query = mysqli_query($conn, "SELECT * from contact 
+                                          WHERE first_name LIKE '%$value%' 
+                                          OR last_name LIKE '%$value%' 
+                                          OR phone_number LIKE '%$value%' 
+                                          OR address LIKE '%$value%'");
+            ?>
+
+
+
+            <div align="left"><h4> Search result: </h4></div>
+                <table class="table table-hover table-striped">
+                     <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Phone number</th>
+                        <th>Address</th>
+                        <!--<th>Comment</th>-->
+                        <th>&nbsp;</th>
+                     </tr>
+
+            <?php  while($run = mysqli_fetch_array($query)){ ?>
+
+                <tr>
+                 <td><?php  $first_name = $run['first_name'];echo $first_name; ?></td>
+                 <td><?php  $last_name = $run['last_name'];echo $last_name; ?></td>
+                 <td><?php  $phone_number = $run['phone_number'];echo $phone_number; ?></td>
+                 <td><?php  $address = $run['address'];echo $address; ?></td>
+                 <!--<td><?php echo $this->escapeHtml($cont->comment);?></td>-->
+                 <td>
+                     <a href="<?php echo $this->url('contact',
+                         array('action'=>'edit', 'id' => $run['id']));?>">Edit</a> | 
+                     <a href="<?php echo $this->url('contact',
+                         array('action'=>'delete', 'id' => $run['id']));?>">Delete</a>
+                 </td>
+             </tr>
+             <?php } ?>
+            <?php
+                } else {
+
+                    echo "<span style='color:red;'>Please search ...</span>";
+            } ?>
+            </table>
+
+<!--  ////////////////////////////////////////////////////////  -->
+
+<!--        END of block  that needs to be processed ....       -->
+
+<!--  ////////////////////////////////////////////////////////  -->
+
+
+<hr>
+
+<?php
+$title = 'My contacts';
+ $this->headTitle($title);
+ ?>
+
+ <h1><span class="glyphicon glyphicon-user"></span>  <?php echo $this->escapeHtml($title); ?></h1>
+ <div class="scroll-top-wrapper ">
+    <span class="scroll-top-inner">
+        <i class="fa fa-2x fa-arrow-circle-up"></i>
+    </span>
+ </div>  
+ <p>
+     <a href="<?php echo $this->url('contact', array('action'=>'add'));?>">Add new contact</a>
+ </p>
+
+ <table class="table table-hover">
+ <tr>
+ 	<th>First Name</th>
+    <th>Last Name</th>
+    <th>Phone number</th>
+    <th>Address</th>
+    <!--<th>Comment</th>-->
+    <th>&nbsp;</th>
+ </tr>
+ <?php foreach ($this->paginator as $cont) : ?>
+ <tr>
+     <td><?php echo $this->escapeHtml($cont->first_name);?></td>
+     <td><?php echo $this->escapeHtml($cont->last_name);?></td>
+     <td><?php echo $this->escapeHtml($cont->phone_number);?></td>
+     <td><?php echo $this->escapeHtml($cont->address);?></td>
+     <!--<td><?php echo $this->escapeHtml($cont->comment);?></td>-->
+     <td>
+         <a href="<?php echo $this->url('contact',
+             array('action'=>'edit', 'id' => $cont->id));?>">Edit</a> | 
+         <a href="<?php echo $this->url('contact',
+             array('action'=>'delete', 'id' => $cont->id));?>">Delete</a>
+     </td>
+ </tr>
+ <?php endforeach; ?>
+ </table>
+
+ <?php
+    echo $this->paginationControl(
+        $this->paginator,
+        'sliding',
+        array('partial/paginator.phtml' , 'Contact'),
+        array(
+            'route' => 'contact'
+        )
+    );
+ ?>
